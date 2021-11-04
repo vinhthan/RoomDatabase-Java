@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 addUser();
             }
         });
+        list = UserDatabase.getInstance(this).userDAO().getListUser();
+        userAdapter.setData(list);
 
 
     }
