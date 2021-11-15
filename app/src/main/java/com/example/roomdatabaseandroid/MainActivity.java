@@ -1,9 +1,11 @@
 package com.example.roomdatabaseandroid;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btn_add);
         rcy = findViewById(R.id.rcy);
 
-        userAdapter = new UserAdapter();
+        userAdapter = new UserAdapter(new UserAdapter.IClickItem() {
+            @Override
+            public void delete(User user) {
+                deleteUser(user);
+            }
+        });
         list = new ArrayList<>();
         userAdapter.setData(list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -63,6 +70,27 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "add success", Toast.LENGTH_SHORT).show();
         edtName.setText("");
 
+        list = UserDatabase.getInstance(this).userDAO().getListUser();
+        userAdapter.setData(list);
+    }
+
+    private void deleteUser(User user) {
+        new AlertDialog.Builder(this)
+                .setTitle("ban co muon xoa k")
+                .setPositiveButton("Co", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //delete
+                        UserDatabase.getInstance(MainActivity.this).userDAO().delete(user);
+                        Toast.makeText(MainActivity.this, "da xoa", Toast.LENGTH_SHORT).show();
+                        reLoadData();
+                    }
+                })
+                .setNegativeButton("Khong", null)
+                .show();
+    }
+
+    private void reLoadData() {
         list = UserDatabase.getInstance(this).userDAO().getListUser();
         userAdapter.setData(list);
     }
